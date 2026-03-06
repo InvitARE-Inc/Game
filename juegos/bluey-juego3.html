@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>¿Dónde está Bluey? - Escuela | Mundo Mágico</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+
+    <style>
+        :root {
+            --glass: rgba(255, 255, 255, 0.12);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --accent: #00f2fe;
+            --accent-2: #4facfe;
+            --text-light: #f8f9fa;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: radial-gradient(circle at top right, #1a1a2e, #16213e);
+            color: var(--text-light);
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .btn-back {
+            display: inline-flex;
+            align-items: center;
+            color: white;
+            text-decoration: none;
+            background: rgba(255,255,255,0.1);
+            padding: 8px 16px;
+            border-radius: 50px;
+            border: 1px solid var(--glass-border);
+            transition: 0.3s;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .btn-back:hover {
+            background: var(--accent);
+            color: #1a1a2e;
+            transform: translateX(-5px);
+        }
+
+        .main-title {
+            font-weight: 800;
+            background: linear-gradient(135deg, #fff 0%, var(--accent) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .game-layout {
+            display: flex;
+            gap: 20px;
+            align-items: flex-start;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .sidebar-objetos {
+            flex: 0 0 280px; 
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 15px;
+            padding: 20px;
+        }
+
+        .sidebar-title {
+            color: var(--accent);
+            font-weight: 600;
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            border-bottom: 2px dashed var(--glass-border);
+            padding-bottom: 10px;
+        }
+
+        .lista-objetos {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .item-objeto {
+            background: rgba(255,255,255,0.05);
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 10px;
+            border: 1px solid transparent;
+            display: flex;
+            align-items: center;
+            transition: 0.3s;
+            color: rgba(255,255,255,0.8);
+        }
+
+        .item-objeto.encontrado {
+            background: rgba(46, 204, 113, 0.2);
+            border-color: #2ecc71;
+            color: #2ecc71;
+            text-decoration: line-through;
+        }
+
+        .objeto-icono-check {
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            border: 2px solid var(--glass-border);
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            color: transparent;
+        }
+
+        .item-objeto.encontrado .objeto-icono-check {
+            border-color: #2ecc71;
+            background-color: #2ecc71;
+            color: #1a1a2e;
+        }
+
+        .juego-main {
+            flex: 1;
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 15px;
+            padding: 10px;
+        }
+
+        .escena-wrapper {
+            position: relative;
+            border-radius: 10px;
+            overflow: hidden;
+            cursor: crosshair;
+        }
+
+        #img-escuela {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .objeto-oculto {
+            position: absolute;
+            z-index: 10;
+            border-radius: 50%;
+            border: 2px solid transparent; 
+            transition: 0.3s;
+        }
+
+        .objeto-oculto.encontrado {
+            border: 4px solid #f1c40f;
+            background: rgba(241, 196, 15, 0.2);
+            box-shadow: 0 0 20px #f1c40f;
+            pointer-events: none;
+        }
+
+        @media (max-width: 992px) {
+            .game-layout { flex-direction: column-reverse; }
+            .sidebar-objetos { flex: 1 1 auto; width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container-fluid px-4">
+        <a href="../index2.html" class="btn-back">
+            <i class="fas fa-chevron-left me-2"></i> Volver al Menú
+        </a>
+       
+        <h1 class="main-title">¿DÓNDE ESTÁ BLUEY? - LA ESCUELA</h1>
+
+        <main class="game-layout">
+            
+            <aside class="sidebar-objetos animate__animated animate__fadeInLeft">
+                <div class="sidebar-title">Objetos por encontrar:</div>
+                
+                <ul class="lista-objetos" id="lista-objetos">
+                    <li class="item-objeto" id="li-libro">
+                        <div class="objeto-icono-check"><i class="fas fa-check"></i></div>
+                        Caballo de palo negro
+                    </li>
+                    <li class="item-objeto" id="li-mochila">
+                        <div class="objeto-icono-check"><i class="fas fa-check"></i></div>
+                        cojin amarillo
+                    </li>
+                    <li class="item-objeto" id="li-manzana">
+                        <div class="objeto-icono-check"><i class="fas fa-check"></i></div>
+                        Pluma
+                    </li>
+                    <li class="item-objeto" id="li-regla">
+                        <div class="objeto-icono-check"><i class="fas fa-check"></i></div>
+                        Cocodrilo
+                    </li>
+                    <li class="item-objeto" id="li-lapiz">
+                        <div class="objeto-icono-check"><i class="fas fa-check"></i></div>
+                        Pulcera roja
+                    </li>
+                </ul>
+
+                <div class="text-center mt-4 border-top border-secondary pt-3 border-opacity-25">
+                    <small class="opacity-50">Encontrados:</small>
+                    <div class="h3 fw-800 text-info"><span id="encontrados">0</span> / 5</div>
+                    <button onclick="location.reload()" class="btn btn-outline-light btn-sm mt-2 w-100">
+                        <i class="fas fa-redo me-2"></i>Reiniciar Nivel
+                    </button>
+                </div>
+            </aside>
+
+            <section class="juego-main animate__animated animate__fadeInRight">
+                <div class="escena-wrapper shadow-lg">
+                    <img id="img-escuela" src="Bluey/escuela.jpg" alt="Escuela de Bluey" onerror="this.src='../Bluey/escuela.jpg'">
+                    
+                    <div class="objeto-oculto" data-objeto="libro" style="top: 33%; left: 1%; width: 6%; height: 6%;"></div>
+                    <div class="objeto-oculto" data-objeto="mochila" style="top: 40%; left: 83%; width: 7%; height: 9%;"></div>
+                    <div class="objeto-oculto" data-objeto="manzana" style="top: 19%; left: 18%; width: 4%; height: 7%;"></div>
+                    <div class="objeto-oculto" data-objeto="regla" style="top: 52%; left: 47%; width: 11%; height: 6%;"></div>
+                    <div class="objeto-oculto" data-objeto="lapiz" style="top: 10%; left: 94.5%; width: 3%; height: 7%;"></div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            let encontradosCount = 0;
+            const totalObjetos = 5;
+            const zonas = document.querySelectorAll('.objeto-oculto');
+            const contadorText = document.getElementById('encontrados');
+
+            zonas.forEach(zona => {
+                zona.addEventListener('click', function() {
+                    if (this.classList.contains('encontrado')) return;
+
+                    const objetoId = this.getAttribute('data-objeto');
+                    this.classList.add('encontrado', 'animate__animated', 'animate__heartBeat');
+                    
+                    const itemLista = document.getElementById(`li-${objetoId}`);
+                    if (itemLista) itemLista.classList.add('encontrado');
+
+                    encontradosCount++;
+                    contadorText.textContent = encontradosCount;
+
+                    if (encontradosCount === totalObjetos) {
+                        setTimeout(() => {
+                            alert("¡Fantástico! Has completado la escuela. ¡Eres un experto buscador!");
+                        }, 500);
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

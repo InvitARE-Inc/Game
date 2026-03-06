@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mega Memory | Mundo Mágico</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+
+    <style>
+        :root {
+            --glass: rgba(255, 255, 255, 0.12);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --accent: #00f2fe;
+            --accent-2: #4facfe;
+            --text-light: #f8f9fa;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: radial-gradient(circle at top right, #1a1a2e, #16213e);
+            color: var(--text-light);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .glass-container {
+            background: var(--glass);
+            backdrop-filter: blur(15px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .main-title {
+            font-weight: 800;
+            background: linear-gradient(135deg, #fff 0%, var(--accent) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-align: center;
+        }
+
+        #tablero {
+            display: grid;
+            gap: 12px;
+            perspective: 1000px;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        .carta {
+            width: 100px;
+            height: 100px;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.5s;
+            cursor: pointer;
+        }
+
+        .carta.volteada, .carta.encontrada {
+            transform: rotateY(180deg);
+        }
+
+        .cara {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 12px;
+            border: 1px solid var(--glass-border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .trasera {
+            background: linear-gradient(135deg, #1e3a8a, #0d1b2a);
+            color: var(--accent);
+            font-size: 2rem;
+        }
+
+        .trasera::after {
+            content: "\f0d0";
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+        }
+
+        .frontal {
+            background: white;
+            transform: rotateY(180deg);
+            padding: 8px;
+        }
+
+        .frontal img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .carta.encontrada {
+            pointer-events: none;
+            border: 3px solid #2ecc71;
+            border-radius: 12px;
+        }
+
+        .stat-card {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--glass-border);
+            border-radius: 15px;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .btn-magic {
+            background: #fff;
+            color: #1a1a2e;
+            border: none;
+            border-radius: 12px;
+            padding: 10px 25px;
+            font-weight: 700;
+            transition: 0.3s;
+        }
+
+        @media (max-width: 576px) {
+            .carta { width: 70px; height: 70px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <a href="../index2.html" class="btn-back">
+            <i class="fas fa-chevron-left me-2"></i> Volver al Menú
+        </a>
+        <header class="text-center mb-4">
+            <h1 class="main-title">MEGA MEMORY</h1>
+            <p id="nivel-txt" class="badge bg-primary">Nivel 1</p>
+        </header>
+
+        <main class="glass-container">
+            <div class="row g-3 justify-content-center mb-4 text-center">
+                <div class="col-4">
+                    <div class="stat-card">
+                        <small class="d-block opacity-50">Pasos</small>
+                        <span class="h5 m-0" id="movs">0</span>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="stat-card">
+                        <small class="d-block opacity-50">Pares</small>
+                        <span class="h5 m-0" id="pares-txt">0/0</span>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tablero"></div>
+
+            <div class="text-center mt-4">
+                <button onclick="prepararNivel()" class="btn-magic">Reiniciar Juego</button>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const config = {
+            // Lista de posibles rutas donde pueden estar tus imágenes
+            rutasPosibles: [
+                "imagenes/memoria/",
+                "../imagenes/memoria/",
+                "/imagenes/memoria/"
+            ],
+            niveles: [{f:4, c:4}, {f:4, c:5}]
+        };
+
+        let juego = {
+            nivel: 0,
+            abiertas: [],
+            encontradas: 0,
+            pasos: 0,
+            bloqueo: false
+        };
+
+        function prepararNivel() {
+            const conf = config.niveles[juego.nivel];
+            const totalPares = (conf.f * conf.c) / 2;
+            juego.abiertas = []; juego.encontradas = 0; juego.pasos = 0; juego.bloqueo = false;
+
+            const tablero = document.getElementById('tablero');
+            tablero.innerHTML = '';
+            tablero.style.gridTemplateColumns = `repeat(${conf.c}, auto)`;
+            
+            actualizarUI(totalPares);
+
+            const ids = Array.from({length: 32}, (_, i) => i + 1).sort(() => Math.random() - 0.5).slice(0, totalPares);
+            const mazo = [...ids, ...ids].sort(() => Math.random() - 0.5);
+
+            mazo.forEach(id => {
+                const carta = document.createElement('div');
+                carta.className = 'carta';
+                
+                // --- LÓGICA DE IMAGEN INTELIGENTE ---
+                const img = document.createElement('img');
+                let rutaIntento = 0;
+                
+                // Función que prueba la siguiente ruta si la actual falla
+                img.onerror = function() {
+                    rutaIntento++;
+                    if (rutaIntento < config.rutasPosibles.length) {
+                        this.src = config.rutasPosibles[rutaIntento] + `Imagen${id}.png`;
+                    } else {
+                        console.error(`No se pudo cargar la Imagen${id}.png en ninguna ruta.`);
+                    }
+                };
+                
+                // Primer intento
+                img.src = config.rutasPosibles[0] + `Imagen${id}.png`;
+
+                carta.innerHTML = `
+                    <div class="cara frontal"></div>
+                    <div class="cara trasera"></div>
+                `;
+                carta.querySelector('.frontal').appendChild(img);
+
+                carta.onclick = () => {
+                    if (juego.bloqueo || carta.classList.contains('volteada')) return;
+                    carta.classList.add('volteada');
+                    juego.abiertas.push({el: carta, id: id});
+
+                    if (juego.abiertas.length === 2) {
+                        juego.pasos++;
+                        juego.bloqueo = true;
+                        
+                        const [a, b] = juego.abiertas;
+                        if (a.id === b.id) {
+                            a.el.classList.add('encontrada');
+                            b.el.classList.add('encontrada');
+                            juego.encontradas++;
+                            juego.abiertas = [];
+                            juego.bloqueo = false;
+                            actualizarUI(totalPares);
+                            if (juego.encontradas === totalPares) alert("¡Nivel Completado!");
+                        } else {
+                            setTimeout(() => {
+                                a.el.classList.remove('volteada');
+                                b.el.classList.remove('volteada');
+                                juego.abiertas = [];
+                                juego.bloqueo = false;
+                            }, 1000);
+                        }
+                    }
+                };
+                tablero.appendChild(carta);
+            });
+        }
+
+        function actualizarUI(t) {
+            document.getElementById('movs').textContent = juego.pasos;
+            document.getElementById('pares-txt').textContent = `${juego.encontradas}/${t}`;
+        }
+
+        window.onload = prepararNivel;
+    </script>
+</body>
+</html>

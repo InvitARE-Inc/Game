@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Word Hunter | Mundo Mágico</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+
+    <style>
+        :root {
+            --glass: rgba(255, 255, 255, 0.12);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --accent: #00f2fe;
+            --accent-2: #4facfe;
+            --text-light: #f8f9fa;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: radial-gradient(circle at top right, #1a1a2e, #16213e);
+            color: var(--text-light);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .glass-container {
+            background: var(--glass);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 30px;
+            margin-top: 2rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .main-title {
+            font-weight: 800;
+            background: linear-gradient(135deg, #fff 0%, var(--accent) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -1px;
+        }
+
+        .tablero-sopa {
+            display: grid;
+            gap: 6px;
+            margin: 20px auto;
+            justify-content: center;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 15px;
+            border: 1px solid var(--glass-border);
+        }
+
+        .celda-sopa {
+            width: 42px;
+            height: 42px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: 0.2s;
+            user-select: none;
+        }
+
+        .celda-sopa:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: var(--accent);
+            transform: scale(1.05);
+        }
+
+        .celda-sopa.seleccionada {
+            background: var(--accent-2);
+            color: #1a1a2e;
+            box-shadow: 0 0 15px var(--accent-2);
+        }
+
+        .celda-sopa.encontrada {
+            background: #2ecc71;
+            color: white;
+            border-color: #2ecc71;
+            box-shadow: 0 0 10px rgba(46, 204, 113, 0.4);
+        }
+
+        #lista-palabras {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            padding: 0;
+            list-style: none;
+        }
+
+        #lista-palabras li {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            padding: 6px 15px;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            transition: 0.3s;
+        }
+
+        #lista-palabras li.encontrada {
+            background: rgba(46, 204, 113, 0.2);
+            color: #2ecc71;
+            border-color: #2ecc71;
+            text-decoration: line-through;
+        }
+
+        .btn-magic {
+            background: #fff;
+            color: #1a1a2e;
+            border: none;
+            border-radius: 12px;
+            padding: 10px 20px;
+            font-weight: 700;
+            transition: 0.3s;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            width: 100%;
+        }
+
+        .btn-magic:hover {
+            background: var(--accent);
+            box-shadow: 0 0 15px var(--accent);
+        }
+
+        .btn-back {
+            color: var(--text-light);
+            text-decoration: none;
+            opacity: 0.7;
+            transition: 0.3s;
+        }
+
+        .btn-back:hover { opacity: 1; color: var(--accent); }
+
+        .feedback {
+            min-height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 15px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .feedback.exito { color: var(--accent); }
+        .feedback.error { color: #ff2e63; }
+
+        @media (max-width: 576px) {
+            .celda-sopa { width: 34px; height: 34px; font-size: 1rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container pb-5">
+        <header class="pt-4 animate__animated animate__fadeIn">
+            <a href="../index2.html" class="btn-back"><i class="fas fa-arrow-left me-2"></i>Volver al Menú</a>
+            <div class="text-center mt-3">
+                <h1 class="main-title display-4">WORD HUNTER</h1>
+                <p class="opacity-75" id="nivel-info">Cargando nivel...</p>
+            </div>
+        </header>
+
+        <main class="glass-container animate__animated animate__zoomIn">
+            <div class="row">
+                <div class="col-lg-4 text-center border-end border-secondary border-opacity-25 mb-4 mb-lg-0">
+                    <h4 class="mb-4"><i class="fas fa-search me-2 text-info"></i>Palabras</h4>
+                    <ul id="lista-palabras"></ul>
+                    
+                    <div class="mt-4 pt-4 border-top border-secondary border-opacity-25">
+                        <div class="d-grid gap-2">
+                            <button id="pista" class="btn-magic">¿Necesitas una pista?</button>
+                            <button id="reiniciar" class="btn-magic" style="background: rgba(255,255,255,0.1); color: white; border: 1px solid var(--glass-border)">Reiniciar Nivel</button>
+                        </div>
+                        <div id="feedback" class="feedback"></div>
+                    </div>
+                </div>
+
+                <div class="col-lg-8">
+                    <div id="tablero" class="tablero-sopa"></div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const tableroElemento = document.getElementById('tablero');
+            const listaPalabrasElemento = document.getElementById('lista-palabras');
+            const feedbackElemento = document.getElementById('feedback');
+            const nivelInfoElemento = document.getElementById('nivel-info');
+            const btnReiniciar = document.getElementById('reiniciar');
+            const btnPista = document.getElementById('pista');
+            
+            const niveles = [
+                { tamano: 6, palabras: ['SOL', 'LUNA', 'GATO', 'PATO', 'FLOR', 'AGUA'], direcciones: ['horizontal', 'vertical'] },
+                { tamano: 7, palabras: ['PERRO', 'ARBOL', 'NUBE', 'MESA', 'SILLA', 'LIBRO'], direcciones: ['horizontal', 'vertical'] },
+                { tamano: 8, palabras: ['JARDIN', 'VENTANA', 'PELOTA', 'ESCUELA', 'AMIGO', 'CARRO'], direcciones: ['horizontal', 'vertical', 'diagonal'] },
+                { tamano: 9, palabras: ['ELEFANTE', 'MUNECA', 'TELEFONO', 'BICICLETA', 'COMETA', 'PELICULA'], direcciones: ['horizontal', 'vertical', 'diagonal'] },
+                { tamano: 10, palabras: ['EXPLORADOR', 'IMAGINACION', 'FANTASIA', 'MAGIA', 'CUENTO', 'DINOSAURIO'], direcciones: ['horizontal', 'vertical', 'diagonal'] }
+            ];
+            
+            let nivelActual = 0;
+            let tablero = [];
+            let seleccionadas = [];
+            let palabrasEncontradas = 0;
+            let palabrasEnTablero = [];
+            
+            function inicializarJuego(nivel = 0) {
+                nivelActual = nivel;
+                nivelInfoElemento.innerHTML = `<span class="badge bg-info text-dark">Nivel ${nivelActual + 1} de 5</span>`;
+                tableroElemento.innerHTML = '';
+                listaPalabrasElemento.innerHTML = '';
+                feedbackElemento.textContent = '';
+                palabrasEncontradas = 0;
+                seleccionadas = [];
+                
+                const config = niveles[nivel];
+                tablero = Array(config.tamano).fill().map(() => Array(config.tamano).fill(''));
+                tableroElemento.style.gridTemplateColumns = `repeat(${config.tamano}, 1fr)`;
+                
+                palabrasEnTablero = [...config.palabras].sort(() => 0.5 - Math.random()).slice(0, 6);
+                
+                palabrasEnTablero.forEach(palabra => {
+                    let colocada = false;
+                    let intentos = 0;
+                    while (!colocada && intentos < 150) {
+                        const direccion = config.direcciones[Math.floor(Math.random() * config.direcciones.length)];
+                        const fila = Math.floor(Math.random() * (config.tamano - (direccion !== 'horizontal' ? palabra.length : 0)));
+                        const col = Math.floor(Math.random() * (config.tamano - (direccion !== 'vertical' ? palabra.length : 0)));
+                        let puedeColocar = true;
+                        for (let i = 0; i < palabra.length; i++) {
+                            let f = fila + (direccion === 'vertical' || direccion === 'diagonal' ? i : 0);
+                            let c = col + (direccion === 'horizontal' || direccion === 'diagonal' ? i : 0);
+                            if (f >= config.tamano || c >= config.tamano || (tablero[f][c] !== '' && tablero[f][c] !== palabra[i])) { 
+                                puedeColocar = false; break; 
+                            }
+                        }
+                        if (puedeColocar) {
+                            for (let i = 0; i < palabra.length; i++) {
+                                let f = fila + (direccion === 'vertical' || direccion === 'diagonal' ? i : 0);
+                                let c = col + (direccion === 'horizontal' || direccion === 'diagonal' ? i : 0);
+                                tablero[f][c] = palabra[i];
+                            }
+                            colocada = true;
+                        }
+                        intentos++;
+                    }
+                });
+
+                const letras = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+                for (let f = 0; f < config.tamano; f++) {
+                    for (let c = 0; c < config.tamano; c++) {
+                        if (tablero[f][c] === '') tablero[f][c] = letras[Math.floor(Math.random() * letras.length)];
+                        const celda = document.createElement('div');
+                        celda.className = 'celda-sopa animate__animated animate__fadeIn';
+                        celda.textContent = tablero[f][c];
+                        celda.dataset.fila = f;
+                        celda.dataset.col = c;
+                        celda.addEventListener('click', () => manejarSeleccion(celda, f, c));
+                        tableroElemento.appendChild(celda);
+                    }
+                }
+                
+                palabrasEnTablero.forEach(palabra => {
+                    const item = document.createElement('li');
+                    item.textContent = palabra;
+                    item.dataset.palabra = palabra;
+                    listaPalabrasElemento.appendChild(item);
+                });
+            }
+
+            function manejarSeleccion(celda, f, c) {
+                if (celda.classList.contains('encontrada')) return;
+
+                const index = seleccionadas.findIndex(s => s.f === f && s.c === c);
+                if (index !== -1) {
+                    celda.classList.remove('seleccionada');
+                    seleccionadas.splice(index, 1);
+                } else {
+                    celda.classList.add('seleccionada');
+                    seleccionadas.push({ f, c, letra: tablero[f][c] });
+                }
+
+                if (seleccionadas.length >= 2) {
+                    const palabraFormada = seleccionadas.map(s => s.letra).join('');
+                    const palabraInvertida = [...palabraFormada].reverse().join('');
+                    const encontrada = palabrasEnTablero.find(p => p === palabraFormada || p === palabraInvertida);
+
+                    if (encontrada) {
+                        const li = document.querySelector(`li[data-palabra="${encontrada}"]`);
+                        if (li && !li.classList.contains('encontrada')) {
+                            palabrasEncontradas++;
+                            li.classList.add('encontrada');
+                            
+                            seleccionadas.forEach(s => {
+                                const el = document.querySelector(`[data-fila="${s.f}"][data-col="${s.c}"]`);
+                                el.classList.remove('seleccionada');
+                                el.classList.add('encontrada', 'animate__animated', 'animate__pulse');
+                            });
+                            
+                            mostrarFeedback(`¡Excelente! "${encontrada}" encontrada`, 'exito');
+                            seleccionadas = [];
+
+                            if (palabrasEncontradas === palabrasEnTablero.length) {
+                                setTimeout(() => {
+                                    if (nivelActual < niveles.length - 1) inicializarJuego(nivelActual + 1);
+                                    else mostrarFeedback('¡FELICIDADES! COMPLETADO', 'exito');
+                                }, 1000);
+                            }
+                        }
+                    }
+                }
+            }
+
+            function mostrarFeedback(msg, tipo) {
+                feedbackElemento.textContent = msg;
+                feedbackElemento.className = 'feedback ' + tipo;
+                if (tipo === 'exito') setTimeout(() => feedbackElemento.textContent = '', 2000);
+            }
+
+            btnReiniciar.addEventListener('click', () => inicializarJuego(nivelActual));
+            btnPista.addEventListener('click', () => mostrarFeedback("¡Toca las letras de una palabra!", "exito"));
+            
+            inicializarJuego(0);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>¿Dónde está Bluey? | Mundo Mágico</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+
+    <style>
+        :root {
+            --glass: rgba(255, 255, 255, 0.12);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --accent: #00f2fe;
+            --accent-2: #4facfe;
+            --text-light: #f8f9fa;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: radial-gradient(circle at top right, #1a1a2e, #16213e);
+            color: var(--text-light);
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .btn-back {
+            display: inline-flex;
+            align-items: center;
+            color: white;
+            text-decoration: none;
+            background: rgba(255,255,255,0.1);
+            padding: 8px 16px;
+            border-radius: 50px;
+            border: 1px solid var(--glass-border);
+            transition: 0.3s;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .btn-back:hover {
+            background: var(--accent);
+            color: #1a1a2e;
+            transform: translateX(-5px);
+        }
+
+        .main-title {
+            font-weight: 800;
+            background: linear-gradient(135deg, #fff 0%, var(--accent) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        /* --- Estructura Principal (Alineada a la imagen de muestra) --- */
+        .game-layout {
+            display: flex;
+            gap: 20px;
+            align-items: flex-start;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* --- Panel Izquierdo: Lista de Objetos --- */
+        .sidebar-objetos {
+            flex: 0 0 280px; /* Ancho fijo para la columna de objetos */
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 15px;
+            padding: 20px;
+        }
+
+        .sidebar-title {
+            color: var(--accent);
+            font-weight: 600;
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            border-bottom: 2px dashed var(--glass-border);
+            padding-bottom: 10px;
+        }
+
+        .lista-objetos {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .item-objeto {
+            background: rgba(255,255,255,0.05);
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 10px;
+            border: 1px solid transparent;
+            display: flex;
+            align-items: center;
+            transition: 0.3s;
+            color: rgba(255,255,255,0.8);
+        }
+
+        .item-objeto:hover {
+            border-color: var(--glass-border);
+            background: rgba(255,255,255,0.1);
+        }
+
+        .item-objeto.encontrado {
+            background: rgba(46, 204, 113, 0.2);
+            border-color: #2ecc71;
+            color: #2ecc71;
+            text-decoration: line-through;
+        }
+
+        .objeto-icono-check {
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            border: 2px solid var(--glass-border);
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            color: transparent;
+        }
+
+        .item-objeto.encontrado .objeto-icono-check {
+            border-color: #2ecc71;
+            background-color: #2ecc71;
+            color: #1a1a2e;
+        }
+
+        /* --- Panel Derecho: Imagen del Juego --- */
+        .juego-main {
+            flex: 1; /* Ocupa el resto del espacio */
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 15px;
+            padding: 10px;
+        }
+
+        .escena-wrapper {
+            position: relative;
+            border-radius: 10px;
+            overflow: hidden;
+            cursor: crosshair;
+        }
+
+        /* --- EFECTO DE LUPA/SOMBRA NEGRA ELIMINADO --- */
+        /* Se ha quitado el pseudo-elemento ::after que generaba la sombra radial */
+
+        #img-playa {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        /* Zonas interactivas */
+        .objeto-oculto {
+            position: absolute;
+            z-index: 10;
+            border-radius: 50%;
+            /* Debug: cambiar transparent por red para ver las zonas */
+            border: 2px solid transparent; 
+            transition: 0.3s;
+        }
+
+        .objeto-oculto.encontrado {
+            border: 4px solid #f1c40f;
+            background: rgba(241, 196, 15, 0.2);
+            box-shadow: 0 0 20px #f1c40f;
+            pointer-events: none;
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .game-layout { flex-direction: column-reverse; }
+            .sidebar-objetos { flex: 1 1 auto; width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container-fluid px-4">
+        <a href="../index2.html" class="btn-back">
+            <i class="fas fa-chevron-left me-2"></i> Volver al Menú
+        </a>
+<a href="bluey-juego2.html" class="btn-back" style="background: var(--accent); color: #1a1a2e; margin-left: 10px;">
+    Siguiente <i class="fas fa-chevron-right ms-2"></i>
+</a>
+        <h1 class="main-title">¿DÓNDE ESTÁ BLUEY?</h1>
+
+        <main class="game-layout">
+            
+            <aside class="sidebar-objetos animate__animated animate__fadeInLeft">
+                <div class="sidebar-title">Objetos por encontrar:</div>
+                
+                <ul class="lista-objetos" id="lista-objetos">
+                    <li class="item-objeto" id="li-bingo">
+                        <div class="objeto-icono-check"><i class="fas fa-check"></i></div>
+                        Bingo
+                    </li>
+                    <li class="item-objeto" id="li-bluey">
+                        <div class="objeto-icono-check"><i class="fas fa-check"></i></div>
+                        Bluey
+                    </li>
+                    <li class="item-objeto" id="li-chanclas">
+                        <div class="objeto-icono-check"><i class="fas fa-check"></i></div>
+                        Chanclas rosas
+                    </li>
+                    <li class="item-objeto" id="li-pala">
+                        <div class="objeto-icono-check"><i class="fas fa-check"></i></div>
+                        Una pala rosa
+                    </li>
+                    <li class="item-objeto" id="li-pelicano">
+                        <div class="objeto-icono-check"><i class="fas fa-check"></i></div>
+                        Un pelícano
+                    </li>
+                    <li class="item-objeto" id="li-caracola">
+                        <div class="objeto-icono-check"><i class="fas fa-check"></i></div>
+                        La caracola de Bluey
+                    </li>
+                    <li class="item-objeto" id="li-toalla">
+                        <div class="objeto-icono-check"><i class="fas fa-check"></i></div>
+                        Una toalla de rayas verdes
+                    </li>
+                    <li class="item-objeto" id="li-protector">
+                        <div class="objeto-icono-check"><i class="fas fa-check"></i></div>
+                        Una botella de protector solar
+                    </li>
+                </ul>
+
+                <div class="text-center mt-4 border-top border-secondary pt-3 border-opacity-25">
+                    <small class="opacity-50">Encontrados:</small>
+                    <div class="h3 fw-800 text-info"><span id="encontrados">0</span> / 8</div>
+                    <button onclick="prepararNivel()" class="btn btn-outline-light btn-sm mt-2 w-100">
+                        <i class="fas fa-redo me-2"></i>Reiniciar Nivel
+                    </button>
+                </div>
+            </aside>
+
+            <section class="juego-main animate__animated animate__fadeInRight">
+                <div class="escena-wrapper shadow-lg">
+                    <img id="img-playa" src="Bluey/playa.jpg" alt="Playa Bluey" onerror="this.src='../Bluey/playa.jpg'">
+                    
+                    <div class="objeto-oculto" data-objeto="bingo" style="top: 15%; left: 10%; width: 5%; height: 8%;"></div>
+                    <div class="objeto-oculto" data-objeto="bluey" style="top: 23%; left: 83%; width: 6%; height: 10%;"></div>
+                    <div class="objeto-oculto" data-objeto="chanclas" style="top: 56.5%; left: 27%; width: 5%; height: 7%;"></div>
+                    <div class="objeto-oculto" data-objeto="pala" style="top: 37%; left: 86.5%; width: 5%; height: 7%;"></div>
+                    <div class="objeto-oculto" data-objeto="pelicano" style="top: 17%; left: 22%; width: 9%; height: 9%;"></div>
+                    <div class="objeto-oculto" data-objeto="caracola" style="top: 91%; left: 83%; width: 4%; height: 5%;"></div>
+                    <div class="objeto-oculto" data-objeto="toalla" style="top: 65%; left: 84%; width: 15%; height: 6%;"></div>
+                    <div class="objeto-oculto" data-objeto="protector" style="top: 67%; left: 10%; width: 4%; height: 7%;"></div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            let encontradosCount = 0;
+            const totalObjetos = 8;
+            const zonas = document.querySelectorAll('.objeto-oculto');
+            const contadorText = document.getElementById('encontrados');
+            // const sound = document.getElementById('sound-found');
+
+            zonas.forEach(zona => {
+                zona.addEventListener('click', function(e) {
+                    // Evitar clics múltiples en la misma zona
+                    if (this.classList.contains('encontrado')) return;
+
+                    const objetoId = this.getAttribute('data-objeto');
+                    
+                    // 1. Feedback visual en la imagen
+                    this.classList.add('encontrado', 'animate__animated', 'animate__heartBeat');
+                    
+                    // 2. Feedback visual en la lista de la izquierda
+                    const itemLista = document.getElementById(`li-${objetoId}`);
+                    if (itemLista) {
+                        itemLista.classList.add('encontrado');
+                    }
+
+                    // 3. Reproducir sonido (opcional)
+                    // if (sound) sound.play();
+
+                    // 4. Actualizar marcador
+                    encontradosCount++;
+                    contadorText.textContent = encontradosCount;
+
+                    // 5. Condición de victoria
+                    if (encontradosCount === totalObjetos) {
+                        setTimeout(() => {
+                            alert("¡Increíble! Has encontrado todos los objetos ocultos en la playa.");
+                        }, 500);
+                    }
+                });
+            });
+        });
+
+        // Función para reiniciar el nivel
+        function prepararNivel() {
+            location.reload();
+        }
+    </script>
+</body>
+</html>

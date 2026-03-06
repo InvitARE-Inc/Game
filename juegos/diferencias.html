@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dinosaurios - Encuentra las Diferencias | Mundo Mágico</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&family=Fredoka+One&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --color-primario: #6a5acd;
+            --color-secundario: #ff7f50;
+            --color-terciario: #20b2aa;
+            --color-dino: #8B4513;
+        }
+        
+        body {
+            font-family: 'Comic Neue', cursive;
+            background-image: url('fiesta.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+        
+        .contenedor-principal {
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+            padding: 30px;
+            margin: 20px auto;
+            max-width: 1200px;
+            border: 3px solid var(--color-dino);
+        }
+        
+        .titulo-principal {
+            font-family: 'Fredoka One', cursive;
+            color: var(--color-dino);
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 15px;
+            font-size: 2.5rem;
+            background: linear-gradient(to right, var(--color-dino), #5E2605);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .subtitulo {
+            color: var(--color-dino);
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+        
+        .contenido-juego {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-top: 20px;
+            justify-content: center;
+        }
+        
+        .imagen-dino-container {
+            position: relative;
+            border: 3px solid var(--color-dino);
+            border-radius: 10px;
+            overflow: hidden;
+            height: 500px;
+            flex: 1;
+            min-width: 300px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            background-color: #f5f5dc;
+        }
+        
+        .imagen-dino-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: block;
+        }
+        
+        .diferencia-dino {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            background-color: rgba(255, 215, 0, 0.3);
+            border: 3px dashed gold;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            display: none;
+            z-index: 5;
+        }
+        
+        .diferencia-dino-encontrada {
+            background-color: rgba(139, 69, 19, 0.6);
+            border: 3px solid var(--color-dino);
+            display: block !important;
+            animation: pulse 0.5s;
+        }
+        
+        .area-deteccion-dino {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .area-deteccion-dino:hover::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 0, 0.2);
+            top: 0;
+            left: 0;
+        }
+        
+        @keyframes pulse {
+            0% { transform: translate(-50%, -50%) scale(1); }
+            50% { transform: translate(-50%, -50%) scale(1.2); }
+            100% { transform: translate(-50%, -50%) scale(1); }
+        }
+        
+        .contador-dino {
+            text-align: center;
+            margin: 15px 0;
+            font-size: 1.3em;
+            font-weight: bold;
+            color: var(--color-dino);
+            background-color: #f5f5dc;
+            padding: 10px;
+            border-radius: 20px;
+            border: 2px dashed var(--color-dino);
+        }
+        
+        .lista-diferencias-dino {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f5f5dc;
+            border-radius: 10px;
+            border: 2px dashed var(--color-dino);
+            min-height: 120px;
+        }
+        
+        .diferencia-item-dino {
+            display: none;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 12px;
+            background-color: rgba(139, 69, 19, 0.1);
+            border-radius: 20px;
+            border-left: 4px solid var(--color-dino);
+            opacity: 0;
+            transform: translateX(-10px);
+            transition: all 0.5s ease;
+        }
+        
+        .diferencia-item-dino.encontrado {
+            display: flex;
+            background-color: rgba(139, 69, 19, 0.3);
+            border-left: 4px solid #5E2605;
+            opacity: 1;
+            transform: translateX(0);
+        }
+        
+        .numero-diferencia-dino {
+            width: 25px;
+            height: 25px;
+            background-color: var(--color-dino);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        
+        .diferencia-item-dino.encontrado .numero-diferencia-dino {
+            background-color: #5E2605;
+        }
+        
+        .btn-dino {
+            background: linear-gradient(to right, var(--color-dino), #5E2605);
+            color: white;
+            border: none;
+            margin-top: 10px;
+            padding: 10px 25px;
+            border-radius: 50px;
+            font-weight: bold;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+        }
+        
+        .btn-dino:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.2);
+        }
+        
+        .mensaje-exito-dino {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #f5f5dc;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.3);
+            text-align: center;
+            z-index: 100;
+            display: none;
+            border: 3px solid var(--color-dino);
+            max-width: 90%;
+        }
+        
+        .mensaje-exito-dino h3 {
+            color: var(--color-dino);
+            margin-bottom: 15px;
+            font-family: 'Fredoka One', cursive;
+        }
+        
+        .huevo-dino {
+            color: var(--color-dino);
+            font-size: 2rem;
+            margin: 0 5px;
+            animation: bounce 1s infinite alternate;
+        }
+        
+        @keyframes bounce {
+            from { transform: translateY(0); }
+            to { transform: translateY(-10px); }
+        }
+        
+        .mensaje-inicial {
+            text-align: center;
+            font-style: italic;
+            color: var(--color-dino);
+            padding: 10px;
+        }
+        
+        @media (max-width: 768px) {
+            .contenido-juego {
+                flex-direction: column;
+            }
+            
+            .imagen-dino-container {
+                height: 300px;
+            }
+            
+            .titulo-principal {
+                font-size: 2rem;
+            }
+            
+            .diferencia-dino {
+                width: 40px;
+                height: 40px;
+            }
+            
+            .area-deteccion-dino {
+                width: 50px;
+                height: 50px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="contenedor-principal">
+        <header class="text-center mb-4">
+            <h1 class="titulo-principal">Dinosaurios</h1>
+            <h2 class="subtitulo">¡Encuentra las 10 diferencias!</h2>
+        </header>
+        
+        <main>
+            <div class="contador-dino">
+                Diferencias encontradas: <span id="encontradas-dino">0</span> de <span id="total-dino">10</span>
+            </div>
+            
+            <div class="contenido-juego">
+    <!-- Imagen 1 -->
+    <div class="imagen-dino-container">
+        <img src="imagenes/diferencias/dino1.jpg" alt="Escena con dinosaurios 1">
+        
+        <!-- Áreas de detección -->
+        <div class="area-deteccion-dino" data-diferencia="1" style="top: 26%; left: 15%;"></div>
+        <div class="diferencia-dino" data-diferencia="1" style="top: 26%; left: 15%;"></div>
+        
+        <div class="area-deteccion-dino" data-diferencia="2" style="top: 35%; left: 88%;"></div>
+        <div class="diferencia-dino" data-diferencia="2" style="top: 35%; left: 88%;"></div>
+        
+        <div class="area-deteccion-dino" data-diferencia="3" style="top: 88%; left: 8%;"></div>
+        <div class="diferencia-dino" data-diferencia="3" style="top: 88%; left: 8%;"></div>
+        
+        <div class="area-deteccion-dino" data-diferencia="4" style="top: 72%; left: 77%;"></div>
+        <div class="diferencia-dino" data-diferencia="4" style="top: 72%; left: 77%;"></div>
+        
+        <div class="area-deteccion-dino" data-diferencia="5" style="top: 16%; left:40%;"></div>
+        <div class="diferencia-dino" data-diferencia="5" style="top: 16%; left: 40%;"></div>
+        
+        <div class="area-deteccion-dino" data-diferencia="6" style="top: 48%; left: 61%;"></div>
+        <div class="diferencia-dino" data-diferencia="6" style="top: 48%; left: 61%;"></div>
+        
+        <div class="area-deteccion-dino" data-diferencia="7" style="top:45%; left: 12%;"></div>
+        <div class="diferencia-dino" data-diferencia="7" style="top: 45%; left: 12%;"></div>
+        
+        <div class="area-deteccion-dino" data-diferencia="8" style="top: 5%; left: 8%;"></div>
+        <div class="diferencia-dino" data-diferencia="8" style="top: 5%; left: 8%;"></div>
+        
+        <div class="area-deteccion-dino" data-diferencia="9" style="top: 90%; left: 84%;"></div>
+        <div class="diferencia-dino" data-diferencia="9" style="top: 90%; left: 84%;"></div>
+        
+        <div class="area-deteccion-dino" data-diferencia="10" style="top: 60%; left: 52%;"></div>
+        <div class="diferencia-dino" data-diferencia="10" style="top: 60%; left: 52%;"></div>
+    </div>
+    
+    <!-- Imagen 2 -->
+    <div class="imagen-dino-container">
+        <img src="imagenes/diferencias/dino2.jpg" alt="Escena con dinosaurios 2">
+        
+        <!-- Áreas de detección -->
+        <div class="area-deteccion-dino" data-diferencia="1" style="top: 26%; left: 15%;"></div>
+        <div class="diferencia-dino" data-diferencia="1" style="top: 26%; left: 15%;"></div>
+        
+        <div class="area-deteccion-dino" data-diferencia="2" style="top: 35%; left: 88%;"></div>
+        <div class="diferencia-dino" data-diferencia="2" style="top: 35%; left: 88%;"></div>
+        
+        <div class="area-deteccion-dino" data-diferencia="3" style="top: 88%; left: 8%;"></div>
+        <div class="diferencia-dino" data-diferencia="3" style="top: 88%; left: 8%;"></div>
+        
+        <div class="area-deteccion-dino" data-diferencia="4" style="top: 72%; left: 77%;"></div>
+        <div class="diferencia-dino" data-diferencia="4" style="top: 72%; left: 77%;"></div>
+        
+        <div class="area-deteccion-dino" data-diferencia="5" style="top: 16%; left:40%;"></div>
+        <div class="diferencia-dino" data-diferencia="5" style="top: 16%; left: 40%;"></div>
+        
+        <div class="area-deteccion-dino" data-diferencia="6" style="top: 48%; left: 61%;"></div>
+        <div class="diferencia-dino" data-diferencia="6" style="top: 48%; left: 61%;"></div>
+        
+        <div class="area-deteccion-dino" data-diferencia="7" style="top:45%; left: 12%;"></div>
+        <div class="diferencia-dino" data-diferencia="7" style="top: 45%; left: 12%;"></div>
+        
+        <div class="area-deteccion-dino" data-diferencia="8" style="top: 5%; left: 8%;"></div>
+        <div class="diferencia-dino" data-diferencia="8" style="top: 5%; left: 8%;"></div>
+        
+        <div class="area-deteccion-dino" data-diferencia="9" style="top: 90%; left: 84%;"></div>
+        <div class="diferencia-dino" data-diferencia="9" style="top: 90%; left: 84%;"></div>
+        
+        <div class="area-deteccion-dino" data-diferencia="10" style="top: 60%; left: 52%;"></div>
+        <div class="diferencia-dino" data-diferencia="10" style="top: 60%; left: 52%;"></div>
+    </div>
+</div>
+            
+            <div class="lista-diferencias-dino">
+                <div class="mensaje-inicial">¡Encuentra diferencias!</div>
+                
+                <div class="diferencia-item-dino" data-diferencia="1">
+                    <div class="numero-diferencia-dino">1</div>
+                    <span>Mariposa</span>
+                </div>
+                <div class="diferencia-item-dino" data-diferencia="2">
+                    <div class="numero-diferencia-dino">2</div>
+                    <span>Grieta</span>
+                </div>
+                <div class="diferencia-item-dino" data-diferencia="3">
+                    <div class="numero-diferencia-dino">3</div>
+                    <span>Pasto</span>
+                </div>
+                <div class="diferencia-item-dino" data-diferencia="4">
+                    <div class="numero-diferencia-dino">4</div>
+                    <span>Mancha azul</span>
+                </div>
+                <div class="diferencia-item-dino" data-diferencia="5">
+                    <div class="numero-diferencia-dino">5</div>
+                    <span>Gorra</span>
+                </div>
+                <div class="diferencia-item-dino" data-diferencia="6">
+                    <div class="numero-diferencia-dino">6</div>
+                    <span>Cola</span>
+                </div>
+                <div class="diferencia-item-dino" data-diferencia="7">
+                    <div class="numero-diferencia-dino">7</div>
+                    <span>Rio</span>
+                </div>
+                <div class="diferencia-item-dino" data-diferencia="8">
+                    <div class="numero-diferencia-dino">8</div>
+                    <span>Montaña</span>
+                </div>
+                <div class="diferencia-item-dino" data-diferencia="9">
+                    <div class="numero-diferencia-dino">9</div>
+                    <span>Triangulo</span>
+                </div>
+                <div class="diferencia-item-dino" data-diferencia="10">
+                    <div class="numero-diferencia-dino">10</div>
+                    <span>Mancha</span>
+                </div>
+            </div>
+            
+            <div class="text-center mt-4">
+                <button id="btn-nuevo-dino" class="btn-dino"><i class="fas fa-redo"></i> ¡Intentalo otra vez!</button>
+                <div class="text-center mt-4">
+                <a href="../index2.html" class="btn btn-volver"><i class="fas fa-arrow-left"></i> Volver a actividades</a>
+            </div>
+            </div>
+        </main>
+
+        <div class="mensaje-exito-dino" id="mensaje-exito-dino">
+            <h3>¡Excelente trabajo paleontólogo!</h3>
+            <p>Has encontrado todas las diferencias</p>
+            <div>
+                <i class="fas fa-egg huevo-dino"></i>
+                <i class="fas fa-egg huevo-dino"></i>
+                <i class="fas fa-egg huevo-dino"></i>
+            </div>
+            <button class="btn-dino mt-3" id="btn-cerrar-mensaje-dino">Cerrar</button>
+        </div>
+
+        <footer class="text-center mt-5">
+            <p>© 2023 Mundo Mágico - Viaja en el tiempo con los dinosaurios</p>
+        </footer>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const diferencias = document.querySelectorAll('.diferencia-dino');
+            const marcadores = document.querySelectorAll('.area-deteccion-dino');
+            const itemsLista = document.querySelectorAll('.diferencia-item-dino');
+            const contador = document.getElementById('encontradas-dino');
+            const mensajeInicial = document.querySelector('.mensaje-inicial');
+            const totalDiferencias = 10;
+            let encontradas = 0;
+            
+            // Ocultar todas las diferencias al inicio
+            diferencias.forEach(diferencia => {
+                diferencia.style.display = 'none';
+            });
+            
+            // Configurar el evento de clic para cada marcador de diferencia
+            marcadores.forEach(marcador => {
+                marcador.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    
+                    const diferenciaId = this.getAttribute('data-diferencia');
+                    const diferencia = document.querySelectorAll(`.diferencia-dino[data-diferencia="${diferenciaId}"]`);
+                    
+                    if (diferencia && !diferencia[0].classList.contains('diferencia-dino-encontrada')) {
+                        // Marcar diferencia como encontrada en ambas imágenes
+                        diferencia.forEach(diff => {
+                            diff.classList.add('diferencia-dino-encontrada');
+                            diff.style.display = 'block';
+                        });
+                        
+                        // Mostrar el item en la lista
+                        const itemLista = document.querySelector(`.diferencia-item-dino[data-diferencia="${diferenciaId}"]`);
+                        if (itemLista) {
+                            itemLista.classList.add('encontrado');
+                            
+                            // Ocultar mensaje inicial si es la primera diferencia encontrada
+                            if (encontradas === 0) {
+                                mensajeInicial.style.display = 'none';
+                            }
+                        }
+                        
+                        // Actualizar contador
+                        encontradas++;
+                        contador.textContent = encontradas;
+                        
+                        // Mostrar mensaje si se encontraron todas
+                        if (encontradas === totalDiferencias) {
+                            setTimeout(() => {
+                                document.getElementById('mensaje-exito-dino').style.display = 'block';
+                            }, 500);
+                        }
+                    }
+                });
+            });
+            
+            // Configurar clic en la imagen (para que los marcadores sean clickeables)
+            document.querySelectorAll('.imagen-dino-container img').forEach(img => {
+                img.addEventListener('click', function() {
+                    // Este evento permite que los marcadores sean clickeables
+                });
+            });
+            
+            // Botón nuevo juego
+            document.getElementById('btn-nuevo-dino').addEventListener('click', function() {
+                location.reload();
+            });
+            
+            // Botón ayuda
+            document.getElementById('btn-ayuda').addEventListener('click', function() {
+                alert("Haz clic en las áreas donde creas que hay diferencias entre las dos imágenes. Las pistas se revelarán a medida que encuentres diferencias. ¡Encuentra las 10 diferencias para completar el juego!");
+            });
+            
+            // Cerrar mensaje de éxito
+            document.getElementById('btn-cerrar-mensaje-dino').addEventListener('click', function() {
+                document.getElementById('mensaje-exito-dino').style.display = 'none';
+            });
+        });
+    </script>
+</body>
+</html>

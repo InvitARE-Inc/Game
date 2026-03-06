@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rompecabezas Maestro | Mundo Mágico</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+
+    <style>
+        :root {
+            --glass: rgba(255, 255, 255, 0.12);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --accent: #00f2fe;
+            --accent-2: #4facfe;
+            --text-light: #f8f9fa;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: radial-gradient(circle at top right, #1a1a2e, #16213e);
+            color: var(--text-light);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .glass-container {
+            background: var(--glass);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 30px;
+            margin-top: 2rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .main-title {
+            font-weight: 800;
+            background: linear-gradient(135deg, #fff 0%, var(--accent) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -1px;
+        }
+
+        /* Área del Puzzle */
+        .puzzle-wrapper {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 20px;
+            padding: 15px;
+            border: 1px solid var(--glass-border);
+            display: inline-block;
+            max-width: 100%;
+        }
+
+        #puzzle {
+            display: grid;
+            gap: 4px;
+            margin: 0 auto;
+            touch-action: none; /* Mejora en móviles */
+        }
+
+        .puzzle-piece {
+            background-size: 500px 500px;
+            cursor: grab;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .puzzle-piece:active {
+            cursor: grabbing;
+            transform: scale(1.05);
+            z-index: 10;
+            box-shadow: 0 0 20px var(--accent);
+        }
+
+        /* Imagen de Vista Previa */
+        .preview-img {
+            width: 100%;
+            max-width: 400px;
+            border-radius: 20px;
+            border: 4px solid var(--glass-border);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        /* Botones Estilo Mundo Mágico */
+        .btn-magic {
+            background: #fff;
+            color: #1a1a2e;
+            border: none;
+            border-radius: 12px;
+            padding: 12px 25px;
+            font-weight: 700;
+            transition: 0.3s;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+        }
+
+        .btn-magic:hover {
+            background: var(--accent);
+            box-shadow: 0 0 15px var(--accent);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary-magic {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid var(--glass-border);
+        }
+
+        .btn-back {
+            color: var(--text-light);
+            text-decoration: none;
+            opacity: 0.7;
+            transition: 0.3s;
+        }
+
+        .btn-back:hover { opacity: 1; color: var(--accent); }
+
+        .success-banner {
+            background: linear-gradient(90deg, transparent, rgba(46, 204, 113, 0.2), transparent);
+            border-radius: 15px;
+            padding: 15px;
+            margin: 20px 0;
+            color: #2ecc71;
+            font-weight: 700;
+        }
+
+        @media (max-width: 576px) {
+            .puzzle-piece { border-radius: 4px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container pb-5">
+        <header class="pt-4 animate__animated animate__fadeIn text-center">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <a href="../index2.html" class="btn-back"><i class="fas fa-arrow-left me-2"></i>Volver al menú</a>
+                <span class="badge bg-dark border border-secondary p-2" id="difficulty-badge">Nivel: Fácil (3x3)</span>
+            </div>
+            <h1 class="main-title display-4">Rompecabezas Maestro</h1>
+            <p class="opacity-75">Ordena la imagen para completar la misión</p>
+        </header>
+
+        <main class="glass-container animate__animated animate__zoomIn text-center">
+            
+            <div id="setup-area">
+                <img id="preview" class="preview-img mb-4 animate__animated animate__pulse animate__infinite" src="" alt="Vista previa">
+                <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+                    <button id="btn-iniciar" class="btn-magic" onclick="iniciarRompecabezas()">
+                        <i class="fas fa-play me-2"></i>Comenzar Reto
+                    </button>
+                </div>
+            </div>
+
+            <div id="game-area" style="display:none;">
+                <div id="mensaje" class="success-banner animate__animated animate__bounceIn" style="display:none;">
+                    <i class="fas fa-trophy me-2"></i> ¡Misión Cumplida! Has reconstruido la matriz.
+                </div>
+
+                <div class="puzzle-wrapper mb-4">
+                    <div id="puzzle"></div>
+                </div>
+
+                <div class="d-flex justify-content-center gap-3">
+                    <button id="btn-reiniciar" class="btn-magic" style="display:none;" onclick="reiniciarRompecabezas()">
+                        <i class="fas fa-forward me-2"></i>Siguiente Nivel
+                    </button>
+                    <button class="btn-magic btn-secondary-magic" onclick="location.reload()">
+                        <i class="fas fa-sync-alt me-2"></i>Mezclar de nuevo
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        let imagenSeleccionada = "";
+        let ordenCorrecto = [];
+        let dificultad = 3; 
+        const PUZZLE_SIZE = 500; // Tamaño fijo en px para el contenedor
+
+        const showPreview = () => {
+            // Ajustar el tamaño del preview según la pantalla
+            const isMobile = window.innerWidth < 576;
+            const currentSize = isMobile ? 300 : PUZZLE_SIZE;
+            
+            const index = Math.floor(Math.random() * 32) + 1;
+            // Nota: He mantenido tu ruta de imágenes original
+            imagenSeleccionada = `imagenes/memoria/Imagen${index}.png`;
+            const previewImg = document.getElementById("preview");
+            previewImg.src = imagenSeleccionada;
+            
+            // Actualizar badge
+            document.getElementById("difficulty-badge").textContent = `Nivel: ${dificultad}x${dificultad}`;
+        };
+
+        const iniciarRompecabezas = () => {
+            document.getElementById("setup-area").style.display = "none";
+            document.getElementById("game-area").style.display = "block";
+            
+            const puzzle = document.getElementById("puzzle");
+            const isMobile = window.innerWidth < 576;
+            const size = isMobile ? 300 : PUZZLE_SIZE;
+            const pieceSize = size / dificultad;
+
+            puzzle.style.gridTemplateColumns = `repeat(${dificultad}, ${pieceSize}px)`;
+            puzzle.style.gridTemplateRows = `repeat(${dificultad}, ${pieceSize}px)`;
+
+            const piezas = [];
+            for (let y = 0; y < dificultad; y++) {
+                for (let x = 0; x < dificultad; x++) {
+                    piezas.push({ x, y, id: `${x}-${y}` });
+                }
+            }
+
+            ordenCorrecto = piezas.map(p => p.id);
+            const piezasMezcladas = [...piezas].sort(() => Math.random() - 0.5);
+
+            piezasMezcladas.forEach(pos => {
+                const pieza = document.createElement("div");
+                pieza.className = "puzzle-piece animate__animated animate__fadeIn";
+                pieza.draggable = true;
+                pieza.dataset.id = pos.id;
+                pieza.style.width = `${pieceSize}px`;
+                pieza.style.height = `${pieceSize}px`;
+                pieza.style.backgroundImage = `url('${imagenSeleccionada}')`;
+                pieza.style.backgroundSize = `${size}px ${size}px`;
+                pieza.style.backgroundPosition = `-${pos.x * pieceSize}px -${pos.y * pieceSize}px`;
+
+                // Eventos Mouse/Drag
+                pieza.addEventListener("dragstart", e => {
+                    e.dataTransfer.setData("draggedId", e.target.dataset.id);
+                });
+                pieza.addEventListener("dragover", e => e.preventDefault());
+                pieza.addEventListener("drop", handleDrop);
+
+                // Soporte Touch básico para móviles (Swap rápido)
+                pieza.addEventListener("touchstart", handleTouchStart, {passive: false});
+
+                puzzle.appendChild(pieza);
+            });
+        };
+
+        function handleDrop(e) {
+            e.preventDefault();
+            const draggedId = e.dataTransfer.getData("draggedId");
+            const targetEl = e.target.closest('.puzzle-piece');
+            if (!targetEl) return;
+
+            const draggedEl = [...document.getElementById("puzzle").children].find(el => el.dataset.id === draggedId);
+            
+            if (draggedEl && targetEl !== draggedEl) {
+                swapPiezas(draggedEl, targetEl);
+                verificarRompecabezas();
+            }
+        }
+
+        // Lógica simple para móviles: El primer toque selecciona, el segundo intercambia
+        let firstTouchEl = null;
+        function handleTouchStart(e) {
+            const el = e.target.closest('.puzzle-piece');
+            if (!el) return;
+
+            if (!firstTouchEl) {
+                firstTouchEl = el;
+                el.style.boxShadow = "0 0 15px var(--accent)";
+            } else {
+                if (firstTouchEl !== el) {
+                    swapPiezas(firstTouchEl, el);
+                    verificarRompecabezas();
+                }
+                firstTouchEl.style.boxShadow = "none";
+                firstTouchEl = null;
+            }
+        }
+
+        const swapPiezas = (el1, el2) => {
+            const tempId = el1.dataset.id;
+            const tempBg = el1.style.backgroundPosition;
+
+            el1.dataset.id = el2.dataset.id;
+            el1.style.backgroundPosition = el2.style.backgroundPosition;
+
+            el2.dataset.id = tempId;
+            el2.style.backgroundPosition = tempBg;
+        };
+
+        const verificarRompecabezas = () => {
+            const piezasActuales = [...document.getElementById("puzzle").children];
+            const ordenActual = piezasActuales.map(p => p.dataset.id);
+            if (ordenActual.join() === ordenCorrecto.join()) {
+                document.getElementById("mensaje").style.display = "block";
+                document.getElementById("btn-reiniciar").style.display = "inline-block";
+                
+                // Efecto visual en las piezas
+                piezasActuales.forEach(p => {
+                    p.style.border = "none";
+                    p.classList.add('animate__animated', 'animate__pulse');
+                });
+            }
+        };
+
+        const reiniciarRompecabezas = () => {
+            dificultad = Math.min(dificultad + 1, 8); // Aumenta dificultad
+            document.getElementById("mensaje").style.display = "none";
+            document.getElementById("btn-reiniciar").style.display = "none";
+            document.getElementById("game-area").style.display = "none";
+            document.getElementById("puzzle").innerHTML = "";
+            document.getElementById("setup-area").style.display = "block";
+            showPreview();
+        };
+
+        window.onload = showPreview;
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
