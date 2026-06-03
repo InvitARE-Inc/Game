@@ -5,6 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mundo Mágico | Gaming Experience</title>
     
+    <!-- Optimización de carga (Preconnect) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -17,6 +22,7 @@
             --accent: #00f2fe;
             --accent-2: #4facfe;
             --text-light: #f8f9fa;
+            --text-muted: #e0e6ed; 
         }
 
         body {
@@ -25,6 +31,9 @@
             color: var(--text-light);
             min-height: 100vh;
             overflow-x: hidden;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
         }
 
         .navbar-brand {
@@ -38,6 +47,7 @@
         .hero-section {
             padding: 80px 0 60px;
             text-align: center;
+            flex: 1;
         }
 
         .glass-card {
@@ -71,6 +81,11 @@
             display: inline-block;
         }
 
+        .glass-card p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
         .btn-play {
             background: var(--accent);
             color: #1a1a2e;
@@ -93,118 +108,209 @@
             color: #1a1a2e;
         }
 
-        .section-title {
-            font-weight: 800;
-            margin-bottom: 40px;
+        .btn-play:hover .fa-dice {
+            transform: rotate(180deg);
+            transition: transform 0.4s ease;
+        }
+
+        .fa-dice {
+            transition: transform 0.4s ease;
+        }
+
+        #loader-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #16213e;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.4s ease, visibility 0.4s ease;
+        }
+
+        #loader-overlay.active {
+            opacity: 1;
+            visibility: visible;
         }
 
         footer {
-            padding: 40px 0;
+            padding: 20px 0;
             opacity: 0.7;
         }
     </style>
 </head>
 <body>
 
-    <nav class="navbar pt-4">
+    <div id="loader-overlay">
+        <div class="spinner-border text-info" style="width: 3rem; height: 3rem;" role="status">
+            <span class="visually-hidden">Cargando juego...</span>
+        </div>
+    </div>
+
+    <header class="navbar pt-4">
         <div class="container">
-            <a class="navbar-brand animate__animated animate__fadeInLeft" href="#">
+            <a class="navbar-brand animate__animated animate__fadeInLeft" href="#" aria-label="Inicio Mundo Mágico">
                 <i class="fas fa-magic me-2"></i>MUNDO MÁGICO
             </a>
         </div>
-    </nav>
+    </header>
 
-    <div class="container hero-section">
+    <main class="container hero-section">
         <h1 class="display-4 fw-800 mb-3 animate__animated animate__fadeInDown">Centro de Juegos</h1>
         <p class="lead opacity-75 mb-5 animate__animated animate__fadeInUp">Selecciona una experiencia para comenzar tu aventura.</p>
 
+        <!-- Cuadrícula de Juegos -->
         <div class="row g-4 justify-content-center">
             
+            <!-- 1. Memorama -->
             <div class="col-md-4 col-lg-4">
                 <div class="glass-card animate__animated animate__fadeInUp" style="animation-delay: 0.1s;">
                     <div>
-                        <i class="fas fa-clone card-icon"></i>
+                        <i class="fas fa-clone card-icon" aria-hidden="true"></i>
                         <h3>Memorama</h3>
-                        <p class="small opacity-75">Encuentra todas las parejas de cartas iguales.</p>
+                        <p>Encuentra todas las parejas de cartas iguales.</p>
                     </div>
-                    <a href="./juegos/memorama.html" class="btn-play">Jugar</a>
+                    <a href="./juegos/memorama.html" class="btn-play" aria-label="Jugar Memorama">Jugar</a>
                 </div>
             </div>
 
+            <!-- 2. Puzzles -->
             <div class="col-md-4 col-lg-4">
                 <div class="glass-card animate__animated animate__fadeInUp" style="animation-delay: 0.2s;">
                     <div>
-                        <i class="fas fa-puzzle-piece card-icon"></i>
+                        <i class="fas fa-puzzle-piece card-icon" aria-hidden="true"></i>
                         <h3>Puzzles</h3>
-                        <p class="small opacity-75">Ordena las piezas para ver la imagen completa.</p>
+                        <p>Ordena las piezas para ver la imagen completa.</p>
                     </div>
-                    <a href="./juegos/rompecabezas.html" class="btn-play">Jugar</a>
+                    <a href="./juegos/rompecabezas.html" class="btn-play" aria-label="Jugar Puzzles">Jugar</a>
                 </div>
             </div>
 
+            <!-- 3. Sopa de Letras -->
             <div class="col-md-4 col-lg-4">
                 <div class="glass-card animate__animated animate__fadeInUp" style="animation-delay: 0.3s;">
                     <div>
-                        <i class="fas fa-search card-icon"></i>
+                        <i class="fas fa-search card-icon" aria-hidden="true"></i>
                         <h3>Sopa de Letras</h3>
-                        <p class="small opacity-75">Busca las palabras ocultas en el tablero.</p>
+                        <p>Busca las palabras ocultas en el tablero.</p>
                     </div>
-                    <a href="./juegos/sopa-letras.html" class="btn-play">Jugar</a>
+                    <a href="./juegos/sopa-letras.html" class="btn-play" aria-label="Jugar Sopa de Letras">Jugar</a>
                 </div>
             </div>
 
+            <!-- 4. ¿Cuál es Diferente? -->
             <div class="col-md-4 col-lg-4">
                 <div class="glass-card animate__animated animate__fadeInUp" style="animation-delay: 0.4s;">
                     <div>
-                        <i class="fas fa-eye card-icon"></i>
+                        <i class="fas fa-eye card-icon" aria-hidden="true"></i>
                         <h3>¿Cuál es Diferente?</h3>
-                        <p class="small opacity-75">Encuentra la imagen diferente de las demás.</p>
+                        <p>Encuentra la imagen diferente de las demás.</p>
                     </div>
-                    <a href="./juegos/diferente.html" class="btn-play">Jugar</a>
+                    <a href="./juegos/diferente.html" class="btn-play" aria-label="Jugar a encontrar las diferencias">Jugar</a>
                 </div>
             </div>
 
+            <!-- 5. Bluey -->
             <div class="col-md-4 col-lg-4">
                 <div class="glass-card animate__animated animate__fadeInUp" style="animation-delay: 0.5s;">
                     <div>
-                        <i class="fas fa-dog card-icon"></i>
+                        <i class="fas fa-dog card-icon" aria-hidden="true"></i>
                         <h3>¿Dónde está Bluey?</h3>
-                        <p class="small opacity-75">Busca a Bluey y sus amigos escondidos en la playa.</p>
+                        <p>Busca a Bluey y sus amigos escondidos en la playa.</p>
                     </div>
-                    <a href="./juegos/bluey-juego.html" class="btn-play">Jugar</a>
+                    <a href="./juegos/bluey-juego.html" class="btn-play" aria-label="Jugar a buscar a Bluey">Jugar</a>
+                </div>
+            </div>
+
+            <!-- 6. Desafío Matemático -->
+            <div class="col-md-4 col-lg-4">
+                <div class="glass-card animate__animated animate__fadeInUp" style="animation-delay: 0.6s;">
+                    <div>
+                        <i class="fas fa-calculator card-icon" aria-hidden="true"></i>
+                        <h3>Desafío Matemático</h3>
+                        <p>Pon a prueba tu mente con sumas, restas, multiplicaciones y divisiones.</p>
+                    </div>
+                    <a href="./juegos/matematicas.html" class="btn-play" aria-label="Jugar Desafío Matemático">Jugar</a>
+                </div>
+            </div>
+
+            <!-- 7. Tanda de Penales -->
+            <div class="col-md-4 col-lg-4">
+                <div class="glass-card animate__animated animate__fadeInUp" style="animation-delay: 0.7s;">
+                    <div>
+                        <i class="fas fa-futbol card-icon" aria-hidden="true"></i>
+                        <h3>Tanda de Penales</h3>
+                        <p>Demuestra tu precisión y anota en la zona verde.</p>
+                    </div>
+                    <a href="./juegos/penales.html" class="btn-play" aria-label="Jugar Tanda de Penales">Jugar</a>
+                </div>
+            </div>
+
+                        <!-- 8. Doodle Jump -->
+            <div class="col-md-4 col-lg-4">
+                <div class="glass-card animate__animated animate__fadeInUp" style="animation-delay: 0.8s;">
+                    <div>
+                        <i class="fas fa-arrow-up card-icon" aria-hidden="true"></i>
+                        <h3>Doodle Jump</h3>
+                        <p>Salta sin parar, esquiva obstáculos y alcanza la máxima puntuación.</p>
+                    </div>
+                    <a href="./juegos/doodle-jump.html" class="btn-play" aria-label="Jugar Doodle Jump">Jugar</a>
+                </div>
+            </div>
+
+            <!-- 9. Simón Dice -->
+            <div class="col-md-4 col-lg-4">
+                <div class="glass-card animate__animated animate__fadeInUp" style="animation-delay: 0.9s;">
+                    <div>
+                        <i class="fas fa-brain card-icon" aria-hidden="true"></i>
+                        <h3>Simón Dice</h3>
+                        <p>Pon a prueba tu memoria con secuencias de neón.</p>
+                    </div>
+                    <a href="./juegos/simon.html" class="btn-play" aria-label="Jugar Simón Dice">Jugar</a>
                 </div>
             </div>
 
         </div>
 
         <div class="mt-5 pt-4">
-            <button id="juegoAleatorio" class="btn btn-play w-auto px-5 py-3 d-inline-block">
+            <button id="juegoAleatorio" class="btn btn-play w-auto px-5 py-3 d-inline-block" aria-label="Seleccionar un juego al azar">
                 <i class="fas fa-dice me-2"></i> ¡SORPRÉNDEME!
             </button>
         </div>
-    </div>
+    </main>
 
     <footer class="text-center">
-        <p class="small">© 2026 Mundo Mágico Studio. Diversión garantizada.</p>
+        <p class="small m-0">© 2026 Mundo Mágico Studio. Diversión garantizada.</p>
     </footer>
 
     <script>
         document.getElementById('juegoAleatorio').addEventListener('click', function() {
-            const juegos = [
-                './juegos/memorama.html',
-                './juegos/rompecabezas.html',
-                './juegos/sopa-letras.html',
-                './juegos/diferente.html',
-                './juegos/bluey-juego.html'
-            ];
+                    // El array ahora contiene los 9 juegos
+                const juegos = [
+            './juegos/memorama.html',
+            './juegos/rompecabezas.html',
+            './juegos/sopa-letras.html',
+            './juegos/diferente.html',
+            './juegos/bluey-juego.html',
+            './juegos/matematicas.html',
+            './juegos/penales.html',
+            './juegos/doodle-jump.html', 
+            './juegos/simon.html'
+        ];
+            
             const random = juegos[Math.floor(Math.random() * juegos.length)];
             
-            // Efecto de transición simple
-            document.body.style.opacity = "0";
-            document.body.style.transition = "0.5s";
+            const loader = document.getElementById('loader-overlay');
+            loader.classList.add('active');
+            
             setTimeout(() => {
                 window.location.href = random;
-            }, 500);
+            }, 600);
         });
     </script>
 </body>
