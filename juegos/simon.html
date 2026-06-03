@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mundo Mágico | Simón Dice</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+
+    <style>
+        :root {
+            --glass: rgba(255, 255, 255, 0.12);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --accent: #00f2fe;
+            --accent-2: #4facfe;
+            --text-light: #f8f9fa;
+            --text-muted: #e0e6ed;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: radial-gradient(circle at top right, #1a1a2e, #16213e);
+            color: var(--text-light);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            margin: 0;
+        }
+
+        /* Navegación */
+        .navbar-brand {
+            font-weight: 800;
+            font-size: 1.8rem;
+            background: linear-gradient(135deg, #fff 0%, var(--accent) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-decoration: none;
+        }
+
+        .btn-back {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            color: var(--text-light);
+            border-radius: 12px;
+            padding: 8px 16px;
+            font-weight: 600;
+            transition: 0.3s;
+            text-decoration: none;
+        }
+
+        .btn-back:hover {
+            background: rgba(255, 255, 255, 0.2);
+            color: var(--accent);
+            border-color: var(--accent);
+        }
+
+        /* Tarjeta principal */
+        .game-section {
+            padding: 40px 0 60px;
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .glass-card {
+            background: var(--glass);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 35px;
+            max-width: 450px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        /* Estilos específicos del juego Simón Dice */
+        .simon-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            max-width: 300px;
+            margin: 0 auto 30px;
+        }
+
+        .simon-btn {
+            width: 100%;
+            aspect-ratio: 1;
+            border-radius: 20px;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.1s, opacity 0.2s, box-shadow 0.2s;
+            opacity: 0.4;
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.5);
+        }
+
+        /* Colores y brillos neón de los botones */
+        .simon-btn.active, .simon-btn:active { 
+            opacity: 1; 
+            transform: scale(1.05); 
+        }
+        
+        .btn-red { background: #ff0055; }
+        .btn-red.active { box-shadow: 0 0 40px #ff0055, inset 0 0 20px rgba(255,255,255,0.5); }
+        
+        .btn-blue { background: #00f2fe; }
+        .btn-blue.active { box-shadow: 0 0 40px #00f2fe, inset 0 0 20px rgba(255,255,255,0.5); }
+        
+        .btn-green { background: #00ff88; }
+        .btn-green.active { box-shadow: 0 0 40px #00ff88, inset 0 0 20px rgba(255,255,255,0.5); }
+        
+        .btn-yellow { background: #ffea00; }
+        .btn-yellow.active { box-shadow: 0 0 40px #ffea00, inset 0 0 20px rgba(255,255,255,0.5); }
+
+        /* Botón de inicio */
+        .btn-play {
+            background: var(--accent);
+            color: #1a1a2e;
+            border: none;
+            border-radius: 12px;
+            padding: 12px 20px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: 0.3s;
+            width: 100%;
+        }
+
+        .btn-play:hover:not(:disabled) {
+            background: #fff;
+            transform: scale(1.02);
+            color: #1a1a2e;
+        }
+
+        .btn-play:disabled {
+            background: rgba(255, 255, 255, 0.2);
+            color: rgba(255, 255, 255, 0.5);
+            cursor: not-allowed;
+        }
+
+        footer {
+            padding: 20px 0;
+            opacity: 0.7;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <header class="navbar pt-4">
+        <div class="container d-flex justify-content-between align-items-center">
+            <a class="navbar-brand animate__animated animate__fadeInLeft" href="../index.html">
+                <i class="fas fa-magic me-2"></i>MUNDO MÁGICO
+            </a>
+            <a href="../index.html" class="btn-back animate__animated animate__fadeInRight">
+                <i class="fas fa-arrow-left me-2"></i>Volver
+            </a>
+        </div>
+    </header>
+
+    <main class="container game-section flex-grow-1">
+        <div class="glass-card text-center animate__animated animate__fadeInUp">
+            <h1 class="h3 mb-2 fw-600"><i class="fas fa-brain me-2 text-info"></i>Simón Dice</h1>
+            <p id="simon-status" class="text-muted mb-4">Presiona Iniciar para comenzar.</p>
+            
+            <h2 class="h5 mb-4">Nivel: <span id="level-display" class="fw-bold" style="color: var(--accent);">0</span></h2>
+
+            <div class="simon-grid">
+                <button class="simon-btn btn-red" id="btn-0" onclick="playerClick(0)"></button>
+                <button class="simon-btn btn-blue" id="btn-1" onclick="playerClick(1)"></button>
+                <button class="simon-btn btn-green" id="btn-2" onclick="playerClick(2)"></button>
+                <button class="simon-btn btn-yellow" id="btn-3" onclick="playerClick(3)"></button>
+            </div>
+
+            <button class="btn btn-play" onclick="startGame()" id="start-btn">INICIAR JUEGO</button>
+        </div>
+    </main>
+
+    <footer>
+        <p class="small m-0">© 2026 Mundo Mágico Studio. Diversión garantizada.</p>
+    </footer>
+
+    <script>
+        let sequence = [];
+        let playerSequence = [];
+        let level = 0;
+        let isPlaying = false; // Controla si es el turno del jugador
+
+        function startGame() {
+            sequence = [];
+            level = 0;
+            document.getElementById('start-btn').disabled = true;
+            document.getElementById('start-btn').innerText = "JUGANDO...";
+            document.getElementById('simon-status').classList.remove('text-danger');
+            nextLevel();
+        }
+
+        function nextLevel() {
+            playerSequence = [];
+            level++;
+            document.getElementById('level-display').innerText = level;
+            document.getElementById('simon-status').innerHTML = "Observa la secuencia...";
+            
+            // Añadir un nuevo color aleatorio a la secuencia (0 a 3)
+            sequence.push(Math.floor(Math.random() * 4));
+            isPlaying = false; // Bloquea los clics del jugador mientras se muestra la secuencia
+
+            // Mostrar la secuencia
+            let delay = 0;
+            sequence.forEach((colorIndex, i) => {
+                setTimeout(() => {
+                    flashButton(colorIndex);
+                }, 800 + (delay * 600)); // Tiempo de espera entre luces
+                delay++;
+            });
+
+            // Habilitar el turno del jugador cuando termine la secuencia
+            setTimeout(() => {
+                document.getElementById('simon-status').innerHTML = "<span style='color: var(--accent);'>¡Tu turno!</span>";
+                isPlaying = true;
+            }, 800 + (delay * 600));
+        }
+
+        // Ilumina el botón brevemente
+        function flashButton(index) {
+            const btn = document.getElementById(`btn-${index}`);
+            btn.classList.add('active');
+            
+            // Si quieres añadir sonidos, aquí sería el lugar ideal para reproducirlos
+            
+            setTimeout(() => btn.classList.remove('active'), 350);
+        }
+
+        // Maneja el clic del jugador
+        function playerClick(index) {
+            if (!isPlaying) return; // Si no es su turno, ignorar clics
+
+            flashButton(index);
+            playerSequence.push(index);
+
+            const currentMove = playerSequence.length - 1;
+            
+            // Comprobar si se equivocó
+            if (playerSequence[currentMove] !== sequence[currentMove]) {
+                gameOver();
+                return;
+            }
+
+            // Si completó la secuencia correctamente
+            if (playerSequence.length === sequence.length) {
+                isPlaying = false;
+                document.getElementById('simon-status').innerText = "¡Excelente! Preparando siguiente nivel...";
+                setTimeout(nextLevel, 1200);
+            }
+        }
+
+        function gameOver() {
+            document.getElementById('simon-status').innerHTML = "<span class='text-danger fw-bold'>¡Te equivocaste! Fin del juego.</span>";
+            
+            // Hacer parpadear todos los botones en rojo para indicar error
+            const buttons = document.querySelectorAll('.simon-btn');
+            buttons.forEach(btn => btn.style.backgroundColor = '#dc3545');
+            
+            setTimeout(() => {
+                // Restaurar colores originales eliminando el estilo en línea
+                buttons.forEach(btn => btn.style.backgroundColor = '');
+            }, 500);
+
+            document.getElementById('start-btn').disabled = false;
+            document.getElementById('start-btn').innerText = "REINTENTAR";
+            isPlaying = false;
+        }
+    </script>
+</body>
+</html>
