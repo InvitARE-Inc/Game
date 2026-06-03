@@ -46,6 +46,11 @@
         
         #scoreBoard { position: absolute; top: 10px; left: 10px; color: var(--accent); font-weight: 800; z-index: 10; }
         #sprite { display: none; }
+
+        /* Zonas táctiles invisibles */
+        .touch-zone { position: absolute; top: 0; bottom: 0; width: 50%; z-index: 15; touch-action: none; }
+        #touch-left { left: 0; }
+        #touch-right { right: 0; }
     </style>
 </head>
 <body>
@@ -54,6 +59,7 @@
         <div class="container d-flex justify-content-between align-items-center">
             <a class="navbar-brand" href="../index.html"><i class="fas fa-magic me-2"></i>MUNDO MÁGICO</a>
             <div class="d-flex gap-2">
+                <!-- Botón de Reintentar (aparece al iniciar) -->
                 <button id="nav-retry" class="btn-action hidden" onclick="runAction('restart')">
                     <i class="fas fa-redo me-2"></i>Reintentar
                 </button>
@@ -66,6 +72,10 @@
         <div id="scoreBoard"><span id="score">0</span></div>
         
         <canvas id="canvas"></canvas>
+
+        <!-- Zonas táctiles invisibles -->
+        <div id="touch-left" class="touch-zone"></div>
+        <div id="touch-right" class="touch-zone"></div>
 
         <div id="mainMenu" class="menu-overlay">
             <h2 class="fw-800">Doodle Jump</h2>
@@ -92,6 +102,20 @@
             if (action === 'start' && typeof init === 'function') init();
             if (action === 'restart' && typeof reset === 'function') reset();
         }
+
+        // Lógica de control táctil
+        const leftZone = document.getElementById('touch-left');
+        const rightZone = document.getElementById('touch-right');
+
+        function simulateKey(code, isDown) {
+            const event = new KeyboardEvent(isDown ? 'keydown' : 'keyup', { keyCode: code });
+            document.dispatchEvent(event);
+        }
+
+        leftZone.addEventListener('touchstart', (e) => { e.preventDefault(); simulateKey(37, true); });
+        leftZone.addEventListener('touchend', (e) => { e.preventDefault(); simulateKey(37, false); });
+        rightZone.addEventListener('touchstart', (e) => { e.preventDefault(); simulateKey(39, true); });
+        rightZone.addEventListener('touchend', (e) => { e.preventDefault(); simulateKey(39, false); });
     </script>
 </body>
 </html>
